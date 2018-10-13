@@ -104,8 +104,11 @@ void Print_Path_Dij(MGraph G, int v0, int P[], int D[])
 	}
 }
 
-void ShortestPath_Floyd(MGraph G, int P[][][], int D[][])
+void ShortestPath_Floyd(MGraph G, int P[][MaxVertexNum_SP][MaxVertexNum_SP],
+						int D[][MaxVertexNum_SP])
 {
+	int v, w, u;
+	Init_GAM(&G);
 	for(v = 0;v < G.vertex_num_GAM;v++){
 		for(w = 0;w < G.vertex_num_GAM;w++){
 			D[v][w] = G.arcs[v][w];
@@ -130,7 +133,7 @@ void ShortestPath_Floyd(MGraph G, int P[][][], int D[][])
 	}
 }
 
-void Print_Path_Floyd(int v, int num, int P[][][])
+void Print_Path_Floyd(int v, int w, int num, int P[][MaxVertexNum_SP][MaxVertexNum_SP])
 {
 	int i;
 	for(i = 1;i <= num;i++){
