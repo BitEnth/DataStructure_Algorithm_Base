@@ -14,11 +14,13 @@ int Init_GAM(MGraph *G)
 	int i, j;
 	for(i = 0;i < G->vertex_num_GAM;i++){
 		for(j = 0;j < G->vertex_num_GAM;j++){
-			if(G->arcs[i][j] == 0){
+			if(i != j && G->arcs[i][j] == 0){
 				G->arcs[i][j] = INFINITY_SP;
 			}
 		}
 	}
+	printf("\n");
+	Print_GraphAM(G);
 	return 1;
 }
 
@@ -104,48 +106,78 @@ void Print_Path_Dij(MGraph G, int v0, int P[], int D[])
 	}
 }
 
-void ShortestPath_Floyd(MGraph G, int P[][MaxVertexNum_SP][MaxVertexNum_SP],
-						int D[][MaxVertexNum_SP])
+
+/* P[v][w] stands for the bridge vertex of v to w in the shortest path
+ * D[v][w] stands for the value of shortest path between v and w
+ * P[v][w] is initiated by v, and u is regarded as the bridge vertex
+ * if v->u->w is shorter than v->w, P[v][w] will be assigned to u and update
+ * the value of D[v][w]. replacing the previous value v. 
+ * Then every vertex will be scanned as bridge vertex till finding out all the
+ * shortest path of two vertexs*/
+void ShortestPath_Floyd(MGraph G, int P[][MaxVertexNum_SP], int D[][MaxVertexNum_SP])
 {
 	int v, w, u;
 	Init_GAM(&G);
 	for(v = 0;v < G.vertex_num_GAM;v++){
 		for(w = 0;w < G.vertex_num_GAM;w++){
 			D[v][w] = G.arcs[v][w];
-			for(u = 0;u < G.vertex_num_GAM;u++){
-				P[v][w][u] = 0;
-			}
-			if(D[v][w] < INFINITY_SP){
-				P[v][w][v] = 1;
-				P[v][w][w] = 1;
-			}
-		}
-		for(u = 0;u < G.vertex_num_GAM;u++){
-			for(v = 0;v < G.vertex_num_GAM;v++){
-				for(w = 0;w < G.vertex_num_GAM;w++){
-					if(D[v][u] + D[u][w] < D[v][w]){
-						D[v][w] = D[v][u] + D[u][w];
-						P[v][w][u] = 1;
-					}
-				}
-			}
+			P[v][w] = v;
 		}
 	}
+	/*u must be before v and w*/
+	for(u = 0;u < G.vertex_num_GAM;u++){
+		for(v = 0;v < G.vertex_num_GAM;v++){
+			for(w = 0;w < G.vertex_num_GAM;w++){
+				if(D[v][u] + D[u][w] < D[v][w]){
+					D[v][w] = D[v][u] + D[u][w];
+					P[v][w] = u;
+				}
+				printf(" D:%d P:%d",D[v][w], P[v][w]);
+			}
+			printf("\n");
+		}
+		printf("\n");
+	}
+	for(v = 0;v < G.vertex_num_GAM;v++){
+		for(w = 0;w < G.vertex_num_GAM;w++){
+			printf("%d\t", D[v][w]);
+		}
+		printf("\n");
+	}
+	printf("\n");
+	for(v = 0;v < G.vertex_num_GAM;v++){
+		for(w = 0;w < G.vertex_num_GAM;w++){
+			printf("%d\t", P[v][w]);
+		}
+		printf("\n");
+	}
+	printf("\n");
 }
 
-void Print_Path_Floyd(int v, int w, int num, int P[][MaxVertexNum_SP][MaxVertexNum_SP])
+/* v, w stand for two vertexs, respectively. num stands for the amount 
+ * of vertexs 
+ * if there exists the direct link between two vertexs, then flag is true
+ * and print v0->v2; if not, then flag is false and print v0->v1->v2
+ * the variable in 'printf' function can be changed to G.vertexs_GAM, 
+ * and then change the inputinng parameter of Print_Path_Floyd or change
+ * the value of P[][] in ShortestPath_Floyd*/
+void Print_Path_Floyd(int v, int w, int flag, int P[][MaxVertexNum_SP])
 {
-	int i;
-	for(i = 1;i <= num;i++){
-		if(i != v && i!= w && P[v][w][i] == True){
-			break;
+	if(P[v][w] == v){
+		if(flag){
+			printf(" %d->%d ", v, w);
 		}
-	}
-	if(i > num){
-		printf("%d->%d\n", v, w);
+		else{
+			printf("->%d", w);
+		}
+		
 	}
 	else{
-		Print_Path_Floyd(v, i, num, P);
-		Print_Path_Floyd(i, w, num, P);
+		int i = P[v][w];
+		if(flag){
+			printf(" %d", v);
+		}
+		Print_Path_Floyd(v, i, False, P);
+		Print_Path_Floyd(i, w, False, P);
 	}
 }
