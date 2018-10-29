@@ -1,3 +1,4 @@
+/* No test*/
 #include "SearchHeader.h"
 #include <stdio.h>
 
@@ -160,3 +161,4 @@ void AVLInsert(AVLTree *pavlt, AVLTree s)
 	}
 }
 
+/*B- Tree & B+ Tree*/
